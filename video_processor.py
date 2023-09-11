@@ -30,6 +30,9 @@ class VideoProcessor:
 
             bbs = []
 
+            color_white = (255, 255, 255)
+            color_yellow = (0, 255, 255)
+
             for j in range(len(boxes)):
                 b = boxes[j]
                 x1 = int(b[0])
@@ -41,8 +44,7 @@ class VideoProcessor:
                 rect_top_left = (x1, y1)
                 rect_bottom_right = (x2, y2)
                 text_top_left = (x1, y1 - 10)
-                color_white = (255, 255, 255)
-                color_yellow = (0, 255, 255)
+
                 thickness = 1
                 shift = 0
                 font_scale = 0.5
@@ -50,9 +52,18 @@ class VideoProcessor:
                 cv2.rectangle(frame, rect_top_left, rect_bottom_right, color_white, thickness, cv2.LINE_8, shift)
                 cv2.putText(frame, vehicle, text_top_left, cv2.FONT_HERSHEY_SIMPLEX, font_scale, color_yellow,
                             thickness)
-                # box = np.array([x1, y1, x2, y2, confidences[j]])
-                # detects[j, :] = box[:]
                 bbs.append(([x1, y1, x2, y2], confidences[j], vehicle))
+
+            tracks = self.deepsort.update_tracks(bbs, frame=frame)
+
+            for k, track in enumerate(tracks):
+                if not track.is_confirmed():
+                    continue
+                if not 0 <= k < len(bbs):
+                    continue
+                cv2.putText(frame, track.track_id, (bbs[k][0][0], bbs[k][0][1]), cv2.FONT_HERSHEY_SIMPLEX,
+                            0.5, color_yellow, 1)
+
 
             # Отображение кадра с треками
             cv2.imshow(self.window_name, frame)
