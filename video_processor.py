@@ -54,16 +54,17 @@ class VideoProcessor:
                             thickness)
                 bbs.append(([x1, y1, x2, y2], confidences[j], vehicle))
 
-            tracks = self.deepsort.update_tracks(bbs, frame=frame)
+            emb = self.deepsort.generate_embeds(frame, bbs)
+
+            tracks = self.deepsort.update_tracks(bbs, embeds=emb, frame=frame)
 
             for k, track in enumerate(tracks):
                 if not track.is_confirmed():
                     continue
                 if not 0 <= k < len(bbs):
                     continue
-                cv2.putText(frame, track.track_id, (bbs[k][0][0], bbs[k][0][1]), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.putText(frame, track.track_id, (int(bbs[k][0][0]), int(bbs[k][0][1])), cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, color_yellow, 1)
-
 
             # Отображение кадра с треками
             cv2.imshow(self.window_name, frame)

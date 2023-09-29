@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from yolov5.models.experimental import attempt_load
 from yolov5.utils.augmentations import letterbox
-from yolov5.utils.general import non_max_suppression, scale_boxes
+from yolov5.utils.general import non_max_suppression, scale_boxes, xyxy2xywh
 
 dict_object = {
     0: 'bicycle',
@@ -58,25 +58,20 @@ class YOLOv5:
         # NMS
         pred = non_max_suppression(pred, conf_thres, iou_thres, self.classes, agnostic_nms, max_det=max_det)
 
-        boxes = []
         classes = []
-        confidences = []
-        # Process predictions
-        for i, det in enumerate(pred):  # detections per image
-            s, im0 = '', im0s.copy()
+        deth = pred[0]
+        bbox = []
+        conf = []
 
-            s += '%gx%g ' % img.shape[2:]  # print string
-            if len(det):
-                # Rescale boxes from img_size to im0 size
-                det[:, :4] = scale_boxes(img.shape[2:], det[:, :4], im0.shape).round()
+        if deth is not None and len(deth):
+            deth[:, :4] = scale_boxes(img.shape[2:], deth[:, :4], im0s.shape).round()
+            for *xyxy, conf1, cls in reversed(deth):
+                if int(cls) in dict_object.keys():
+                    xywh = xyxy
+                    xywh[-2] = xyxy[-2] - xyxy[0]
+                    xywh[-1] = xyxy[-1] - xyxy[1]
+                    conf.append(float(conf1.cpu()))
+                    classes.append(int(cls.cpu()))
+                    bbox.append([int(i.cpu()) for i in xywh])
 
-                # Write results
-                for *xyxy, conf, cls in reversed(det):
-                    if int(cls) in dict_object.keys():
-                        xywh = xyxy
-                        xywh[-2] = xyxy[-2] - xyxy[0]
-                        xywh[-1] = xyxy[-1] - xyxy[1]
-                        confidences.append(float(conf.cpu()))
-                        classes.append(int(cls.cpu()))
-                        boxes.append([int(i.cpu()) for i in xywh])
-        return boxes, confidences, classes
+        return bbox, conf, classes
