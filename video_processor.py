@@ -61,9 +61,10 @@ class VideoProcessor:
             for k, track in enumerate(tracks):
                 if not track.is_confirmed():
                     continue
-                if not 0 <= k < len(bbs):
+                if track.original_ltwh is None:
                     continue
-                cv2.putText(frame, track.track_id, (int(bbs[k][0][0]), int(bbs[k][0][1])), cv2.FONT_HERSHEY_SIMPLEX,
+                cv2.putText(frame, track.track_id, (int(track.original_ltwh[0]), int(track.original_ltwh[1])),
+                            cv2.FONT_HERSHEY_SIMPLEX,
                             0.5, color_yellow, 1)
 
             # Отображение кадра с треками
