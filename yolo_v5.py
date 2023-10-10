@@ -2,7 +2,7 @@ import numpy as np
 import torch
 from yolov5.models.experimental import attempt_load
 from yolov5.utils.augmentations import letterbox
-from yolov5.utils.general import non_max_suppression, scale_boxes, xyxy2xywh
+from yolov5.utils.general import non_max_suppression, scale_boxes
 
 dict_object = {
     0: 'bicycle',

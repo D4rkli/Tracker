@@ -1,6 +1,6 @@
 import cv2
 from deep_sort_realtime.deepsort_tracker import DeepSort
-from matplotlib import pyplot as plt
+
 from yolo_v5 import dict_object
 
 
@@ -9,9 +9,6 @@ class VideoProcessor:
         self.video_capture = cv2.VideoCapture(video_path)
         self.yolo_model = yolo_model
         self.deepsort = DeepSort()
-
-        plt.ion()
-        self.fig, self.ax = plt.subplots()
 
         self.window_name = "Video Stream"
         cv2.namedWindow(self.window_name, cv2.WINDOW_NORMAL)
@@ -80,4 +77,3 @@ class VideoProcessor:
 
         self.video_capture.release()
         cv2.destroyAllWindows()
-        plt.ioff()

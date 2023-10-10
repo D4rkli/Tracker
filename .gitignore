@@ -1,4 +1,4 @@
 /venv/
-.pt
-.mp4
+*.pt
+*.mp4
 /.idea/
